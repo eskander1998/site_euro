@@ -58,6 +58,8 @@
             <a class="collapse-item active" href="client.php">Gestion des clients</a>
             <a class="collapse-item" href="gestionconge.php">Gestion des congés</a>
             <a class="collapse-item" href="voiture.php">Gestion des voitures</a>
+            <a class="collapse-item" href="gestionfacture.php">Factures</a>
+
 
           </div>
         </div>
