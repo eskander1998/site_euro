@@ -90,6 +90,8 @@
             <a class="collapse-item" href="client.php">Gestion des clients</a>
             <a class="collapse-item" href="gestionconge.php">Gestion des congés</a>
             <a class="collapse-item" href="voiture.php">Gestion des voitures</a>
+                        <a class="collapse-item" href="gestionfacture.php">Factures</a>
+
           </div>
         </div>
       </li>
@@ -360,6 +362,21 @@
           <!-- Page Heading -->
           <h1 class="h3 mb-4 text-gray-800">Les commandes effectuées</h1>
 
+         <center>
+          <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" method="GET">
+          <div class="input-group">
+            <input name="acin" type="text" class="form-control bg-light border-0 small" placeholder="Recherche par ID client" aria-label="Search" aria-describedby="basic-addon2"/>
+              <div class="input-group-append">
+
+<button name="but8" class="btn btn-primary"  type="submit">
+                  <i class="fas fa-search fa-sm"></i>
+
+                </button>
+              </div>
+
+            </div>
+          </form>
+<center/>
       
         <!-- /.container-fluid -->
 
@@ -402,10 +419,84 @@
   <tbody>
 
 
-    <?php
+  <?php
 
+  if (isset($_GET['but8'])) 
+  {   
+   if (empty($_GET['acin'])){
+   
+      $query = "SELECT * FROM commande ORDER BY id asc" ;
+
+   }
+   else {
+   $acin= $_GET['acin'];
+          $query = "SELECT * FROM commande where client=$acin ";}
+$result_tasks = mysqli_query($conn, $query);    
+
+    while($row = mysqli_fetch_assoc($result_tasks)) {?>
+<?php $date1 = date('yy/m/d h:i:s');
+       $date2 = $row['retour'];
+       $timestamp1 = strtotime($date1); 
+        $timestamp2 = strtotime($date2);
+        if ($timestamp1 > $timestamp2)
+        {$row['etat']='effectue';
+       }
+      else {
+         $row['etat']='en cours';
+       } ?>
+      
+    <tr>
+    <td><?php echo $row['id']; ?></td>
+    
+    <td><?php echo $row['client']; ?>  </td>
+         
+         <?php
+             $client=$row['client'];
+             
+             include '../client/config.php';
+
+             $sel = "SELECT * FROM user where id = '$client'  ";
+             $rs = $conn->query($sel);
+             while($rws = $rs->fetch_assoc()){
+        ?>
+      <td> <?php echo $rws['nom'].' '  ; echo $rws['prenom']; ?>
+      </td><?php }?>
+
+        <?php
+             $voiture=$row['voiture'];
+
+             include '../client/config.php';
+
+             $sel = "SELECT * FROM voiture where id = '$voiture'  ";
+             $rs = $conn->query($sel);
+             while($rws = $rs->fetch_assoc()){
+        ?>
+      <td>  <?php echo $row['voiture']; ?> <br>
+        <img src="../img/products/<?php echo $rws['pic'];?>" alt=""> 
+        <?php echo $rws['marque']; echo ' '.$rws['modele']; ?>
+      </td> <?php }?>
+      <td ><?php echo $row['depart']; ?></td>
+      <td ><?php echo $row['retour']; ?></td>
+      <td><?php echo $row['livraison']; ?></td>
+      <td><?php echo $row['chauffeur']; ?></td>
+      <td><?php 
+     echo $row['etat'];
+            ?>
+      
+      </td>
+      <td><?php echo $row['prix']; ?></td> 
+      <td><?php echo $row['paiement']; ?></td>
+      <td><?php echo $row['date_achat']; ?></td> 
+    </td>
+     
+    </tr>
+    <?php   }
+        }
+else {  
+?>
 
     
+    <?php
 $query = "SELECT * FROM commande where etat='effectue' ORDER BY id asc" ;
 
 
@@ -460,7 +551,7 @@ $query = "SELECT * FROM commande where etat='effectue' ORDER BY id asc" ;
   
 
     </tr>
-    <?php  }?>
+    <?php  }}?>
         </tbody>
         </table>
         <br>
