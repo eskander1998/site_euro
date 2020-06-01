@@ -368,8 +368,16 @@ include('db.php');
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Earnings (Monthly)</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Revenue Total</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800"><?php 
+//index.php
+$query_total = "
+   SELECT   SUM(prix) as total FROM commande   ";
+$result_total = mysqli_query($conn, $query_total);
+while($row = mysqli_fetch_assoc($result_total)) { 
+ echo $row['total'].' DT'; 
+}
+?></div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -385,8 +393,15 @@ include('db.php');
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Earnings (Annual)</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Paiement avec Paypal</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800"><?php 
+//index.php
+$query_paypal = "SELECT   SUM(prix) as total_paypal FROM commande where paiement = 'paypal'   ";
+$result_paypal = mysqli_query($conn, $query_paypal);
+while($row = mysqli_fetch_assoc($result_paypal)) { 
+ echo $row['total_paypal'].' DT'; 
+}
+?></div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -402,15 +417,20 @@ include('db.php');
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks</div>
+                      <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Paiement sur place</div>
                       <div class="row no-gutters align-items-center">
                         <div class="col-auto">
-                          <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                          <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800"><?php 
+//index.php
+$query_agence = "SELECT   SUM(prix) as total_agence FROM commande where paiement = 'agence'   ";
+$result_agence = mysqli_query($conn, $query_agence);
+while($row = mysqli_fetch_assoc($result_agence)) { 
+ echo $row['total_agence'].' DT'; 
+}
+?></div>
                         </div>
                         <div class="col">
-                          <div class="progress progress-sm mr-2">
-                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
+                          
                         </div>
                       </div>
                     </div>
@@ -428,8 +448,15 @@ include('db.php');
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Requests</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Paiement avec carte</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800"><?php 
+//index.php
+$query_carte = "SELECT   SUM(prix) as total_carte FROM commande where paiement = 'carte'   ";
+$result_carte = mysqli_query($conn, $query_carte);
+while($row = mysqli_fetch_assoc($result_carte)) { 
+ echo $row['total_carte'].' DT'; 
+}
+?></div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-comments fa-2x text-gray-300"></i>
@@ -559,7 +586,7 @@ $(document).ready(function(){
  
  var donut_chart = Morris.Donut({
      element: 'chart2',
-     colors:['#C4B90B'],
+     colors:['#1cc88a'],
      data: <?php echo $data; ?>
     });
   
@@ -567,136 +594,105 @@ $(document).ready(function(){
 
 </script>
 
-          <!-- Content Row -->
-          <div class="row">
+
+<script type="text/javascript" src="js/loader.js"></script>
+
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable([
+          ['paiement', 'type_paiement'],
+         <?php
+         $sql =   "SELECT paiement, count(*) as type_paiement FROM commande 
+   GROUP BY paiement ";
+         $fire = mysqli_query($conn,$sql);
+          while ($result = mysqli_fetch_assoc($fire)) {
+            echo"['".$result['paiement']."',".$result['type_paiement']."],";
+          }
+
+         ?>
+        ]);
+
+        var options = {
+          title: ''
+
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+
+
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Pourcentage de l'utilisation de chaque mode de paiement</h6>
+                 
+                </div>
+ <div class="card-body">
+                  <div style="width: 900px; height: 500px;">
+        <center><div id="piechart"  style="width: 900px; height: 500px;"></div></center>
+  </div>
+                </div>
+              </div>
 
             <!-- Content Column -->
-            <div class="col-lg-6 mb-4">
-
-              <!-- Project Card Example -->
-              <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Projects</h6>
+         <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Pourcentage des réservations avec et sans chauffeur</h6>
+                 
                 </div>
-                <div class="card-body">
-                  <h4 class="small font-weight-bold">Server Migration <span class="float-right">20%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar bg-danger" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <h4 class="small font-weight-bold">Sales Tracking <span class="float-right">40%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <h4 class="small font-weight-bold">Customer Database <span class="float-right">60%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <h4 class="small font-weight-bold">Payout Details <span class="float-right">80%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <h4 class="small font-weight-bold">Account Setup <span class="float-right">Complete!</span></h4>
-                  <div class="progress">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
+ <div class="card-body">
+                  <div style="width: 900px; height: 500px;">
+        <center><div id="piechart2"  style="width: 900px; height: 500px;"></div></center>
+  </div>
                 </div>
               </div>
 
-              <!-- Color System -->
-              <div class="row">
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-primary text-white shadow">
-                    <div class="card-body">
-                      Primary
-                      <div class="text-white-50 small">#4e73df</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-success text-white shadow">
-                    <div class="card-body">
-                      Success
-                      <div class="text-white-50 small">#1cc88a</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-info text-white shadow">
-                    <div class="card-body">
-                      Info
-                      <div class="text-white-50 small">#36b9cc</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-warning text-white shadow">
-                    <div class="card-body">
-                      Warning
-                      <div class="text-white-50 small">#f6c23e</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-danger text-white shadow">
-                    <div class="card-body">
-                      Danger
-                      <div class="text-white-50 small">#e74a3b</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-secondary text-white shadow">
-                    <div class="card-body">
-                      Secondary
-                      <div class="text-white-50 small">#858796</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <script type="text/javascript" src="js/loader.js"></script>
 
-            </div>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
 
-            <div class="col-lg-6 mb-4">
+      function drawChart() {
 
-              <!-- Illustrations -->
-              <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Illustrations</h6>
-                </div>
-                <div class="card-body">
-                  <div class="text-center">
-                    <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;" src="img/undraw_posting_photo.svg" alt="">
-                  </div>
-                  <p>Add some quality, svg illustrations to your project courtesy of <a target="_blank" rel="nofollow" href="https://undraw.co/">unDraw</a>, a constantly updated collection of beautiful svg images that you can use completely free and without attribution!</p>
-                  <a target="_blank" rel="nofollow" href="https://undraw.co/">Browse Illustrations on unDraw &rarr;</a>
-                </div>
-              </div>
+        var data = google.visualization.arrayToDataTable([
+          ['paiement', 'type_paiement'],
+         <?php
+         $sql =   "SELECT chauffeur, count(*) as type_reservation FROM commande 
+   GROUP BY chauffeur ";
+         $fire = mysqli_query($conn,$sql);
+          while ($result = mysqli_fetch_assoc($fire)) {
+            echo"['".$result['chauffeur']."',".$result['type_reservation']."],";
+          }
 
-              <!-- Approach -->
-              <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Development Approach</h6>
-                </div>
-                <div class="card-body">
-                  <p>Admin</p>
-                  <p class="mb-0">Before working with this theme, you should become familiar with the Bootstrap framework, especially the utility classes.</p>
-                </div>
-              </div>
+         ?>
+        ]);
 
-            </div>
-          </div>
+        var options = {
+          title: ''
 
-        </div>
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('piechart2'));
+
+        chart.draw(data, options);
+      }
+    </script>
         <!-- /.container-fluid -->
 
-      </div>
       <!-- End of Main Content -->
 
       <!-- Footer -->
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Your Website 2019</span>
+            <span>Copyright &copy; Your Website 2020 by Les experts</span>
           </div>
         </div>
       </footer>
