@@ -387,7 +387,17 @@ include("functions.php");?>
       <!-- ADD TASK FORM -->
       <div class="card card-body">
         <form action="save_facture.php" method="POST" name="form">
-          
+          <div class="form-group">
+      <label  style="font-weight: bold">Identifiant du client:</label> <br>
+            <select class="form-control" name="client" minlength="1" required oninvalid="setCustomValidity('Choisir')" oninput="setCustomValidity('')">
+      <?php while ($row = mysqli_fetch_array($listcat)):?>
+
+        <option value="<?php echo $row[0]; ?>"><?php echo $row[0]; ?></option>
+
+
+      <?php endwhile; ?>
+    </select>
+          </div>
 
          <div class="form-group">
       <label style="font-weight: bold">Identifiant de la réservation:</label> <br>
@@ -432,6 +442,7 @@ include("functions.php");?>
         <thead>
           <tr>
             <th>ID FACTURE</th>
+            <th>ID CLIENT</th>
             <th>ID RESERVATION </th>
             <th>NOM CLIENT</th>
             <th>AGENT </th>
@@ -450,6 +461,7 @@ include("functions.php");?>
           while($row = mysqli_fetch_assoc($result_tasks)) { ?>
           <tr>
             <td><?php echo $row['id']; ?></td>
+            <td><?php echo $row['id_client']; ?></td>
             <td><?php echo $row['id_reservation']; ?></td>
             <td><?php echo $row['nom_client']; ?></td>
             <td><?php echo $row['agent']; ?></td>
