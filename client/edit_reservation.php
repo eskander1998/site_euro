@@ -202,19 +202,19 @@ echo "<script type = \"text/javascript\">
         ?>
       <h5> <?php echo $rws['marque']; echo ' '.$rws['modele']; ?> </h5> <br> 
         <img src="../img/products/<?php echo $rws['pic'];?>" alt=""> 
+        <input type=hidden id="test" value=<?php echo $rws['prix']; ?>>
       <?php }?>
           <div class="form-group">
             <a1>Départ : </a1>
-            <input id="datetime" type="text" class="form-control" placeholder="Date départ"  name="depart" min="2018-01-01" max="2020-12-12" value="<?php echo $depart; ?>" >
+            <input id="datetime" type="text" class="form-control" placeholder="Date départ"  onblur="calcul();recup();" name="depart" min="2018-01-01" max="2020-12-12" value="<?php echo $depart; ?>" >
           </div>
           <div class="form-group">
           <a1>Retour : </a1>
-          <input id="datetime2"  type="text"  class="form-control" placeholder="Date retour" name="retour"  min="2018-01-01" max="2020-12-12" value="<?php echo $retour; ?>" >
+          <input id="datetime2"  type="text"  class="form-control" placeholder="Date retour"  onblur="calcul();recup();" name="retour"  min="2018-01-01" max="2020-12-12" value="<?php echo $retour; ?>" >
           </div>
           <div class="form-group">
           <a1>Livraison : </a1>
           <select name="livraison" class="form-control" value="<?php echo $livraison; ?>" placeholder="livraison">
-            <option>  </option>
             <option> Aéroport </option>
             <option> Agence </option>
             <option> Domicile </option>
@@ -239,8 +239,10 @@ echo "<script type = \"text/javascript\">
           </div>
           <div class="form-group">
           <a1>Prix : </a1>
-            <output  name="prix"  > <?php echo $prix; ?> </output>
-            <input type="hidden" name="prix" class="form-control" value="<?php echo $prix; ?>" placeholder="Prix">
+ <input type="hidden" name="prix" class="form-control" id="prix"  autocomplete="off"  autofocus > 
+                      <output class="form-control" id="afficheur" value="" ><?php echo $prix; ?></output> 
+
+          
           </div>
 
          <button class="btn btn-secondary btn-lg" name="update">
@@ -331,21 +333,66 @@ echo "<script type = \"text/javascript\">
     <script src="js/mixitup.min.js"></script>
     <script src="js/main.js"></script>
     <script src="js/jquery.datetimepicker.full.js"></script>
-    <script >
-      
+    <script type="text/javascript" > 
+$('#datetime').datetimepicker({
+    timepicker: true,
+    datepicker: true,
+    minDate: 0,
+    onShow: function(ct){
+        this.setOptions({
+           maxDate: $('#datetime2').val() ? $('#datetime2').val() : false
+        })
+    }
+})
 
+$("#datetime2").datetimepicker({
+    timepicker: true,
+    datepicker: true,
+    onShow: function(ct){
+        this.setOptions({
+            minDate: $('#datetime').val() ? $('#datetime').val() : false
+        })
+    }
+})
 
-        $("#datetime").datetimepicker()
-          
-       
-       
+function dateDiff(date1, date2){
+    var diff = {}                           // Initialisation du retour
+    var tmp = date2 - date1;
+ 
+    tmp = Math.floor(tmp/1000);             // Nombre de secondes entre les 2 dates
+    diff.sec = tmp % 60;                    // Extraction du nombre de secondes
+ 
+    tmp = Math.floor((tmp-diff.sec)/60);    // Nombre de minutes (partie entière)
+    diff.min = tmp % 60;                    // Extraction du nombre de minutes
+ 
+    tmp = Math.floor((tmp-diff.min)/60);    // Nombre d'heures (entières)
+    diff.hour = tmp % 24;                   // Extraction du nombre d'heures
+     
+    tmp = Math.floor((tmp-diff.hour)/24);   // Nombre de jours restants
+    diff.day = tmp;
+     
+    return diff;
+}
+
+function calcul()
+{
+                    var date1 =  new Date(document.getElementById("datetime").value);
+                    var date2 =   new Date(document.getElementById("datetime2").value);
+                    var prix = document.getElementById("test").value;
+                    var diff = dateDiff(date1, date2);
+                    var total=((diff.day) )*prix;
+                    
+                    document.getElementById("prix").value =total;
+                    
+               }
+               
+               function recup(){
+  var rechercher = document.getElementById("prix");
+  var afficheur = document.getElementById("afficheur");
+afficheur.value= rechercher.value;
+}
     </script>
-
-
- <script >
     
-$("#datetime2").datetimepicker()
-    </script>
 </body>
 
 </html>
