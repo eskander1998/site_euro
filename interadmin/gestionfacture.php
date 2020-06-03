@@ -442,7 +442,6 @@ include("functions.php");?>
         <thead>
           <tr>
             <th>ID FACTURE</th>
-            <th>ID CLIENT</th>
             <th>ID RESERVATION </th>
             <th>NOM CLIENT</th>
             <th>AGENT </th>
@@ -461,7 +460,6 @@ include("functions.php");?>
           while($row = mysqli_fetch_assoc($result_tasks)) { ?>
           <tr>
             <td><?php echo $row['id']; ?></td>
-            <td><?php echo $row['id_client']; ?></td>
             <td><?php echo $row['id_reservation']; ?></td>
             <td><?php echo $row['nom_client']; ?></td>
             <td><?php echo $row['agent']; ?></td>
