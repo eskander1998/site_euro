@@ -3,7 +3,7 @@
 
 <head>
 <meta charset="UTF-8">
-    <title>PHP CRUD MYSQL</title>
+    <title>Commandes en cours</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <!-- BOOTSTRAP 4 -->
     <link rel="stylesheet" href="https://bootswatch.com/4/yeti/bootstrap.min.css">
@@ -357,7 +357,7 @@ include("functions.php");?>
         <div class="container-fluid">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800">Les commandes en cours</h1>
+          <h1 class="h3 mb-4 text-gray-800">Les commandes </h1>
 
          <center>
           <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" method="GET">
@@ -373,7 +373,18 @@ include("functions.php");?>
 
             </div>
           </form>
-<center/>
+</center><br>
+          <form  method="GET">
+          <div class="input-group">
+
+            <input name="date1" type="date" class="form-control "  aria-label="Search" aria-describedby="basic-addon2"/>
+            <input name="date2" type="date" class="form-control " aria-label="Search" aria-describedby="basic-addon2"/>
+
+             <input type="submit" name="tridate" class="btn btn-primary"  value="Rechercher">
+
+            </div>
+          </form>
+
         <!-- /.container-fluid -->
 
       </div>
@@ -415,13 +426,88 @@ include("functions.php");?>
   <tbody>
 
 
-    <?php
+ <?php 
 
-  if (isset($_GET['but8'])) 
+
+    if (isset($_GET['tridate'])) 
+  {   if (empty($_GET['date1']and $_GET['date2'] )){
+   
+      $query = "SELECT * FROM commande  where etat='en cours' ORDER BY id asc" ;
+
+   }
+   else {
+   $date1= $_GET['date1'];
+      $date2= $_GET['date2'];
+        echo 'Du '.$date1 ; echo '   Au '.$date2;
+          $query = "SELECT * FROM commande where (depart between '$date1' and '$date2') and  (retour between '$date1' and '$date2') ";}
+$result_tasks = mysqli_query($conn, $query);    
+
+    while($row = mysqli_fetch_assoc($result_tasks)) {?>
+<?php $date1 = date('yy/m/d h:i:s');
+       $date2 = $row['retour'];
+       $timestamp1 = strtotime($date1); 
+        $timestamp2 = strtotime($date2);
+        if ($timestamp1 > $timestamp2)
+        {$row['etat']='effectue';
+       }
+      else {
+         $row['etat']='en cours';
+       } ?>
+      
+    <tr>
+    <td><?php echo $row['id']; ?></td>
+    
+    <td><?php echo $row['client']; ?>  </td>
+         
+         <?php
+             $client=$row['client'];
+             
+             include '../client/config.php';
+
+             $sel = "SELECT * FROM user where id = '$client'  ";
+             $rs = $conn->query($sel);
+             while($rws = $rs->fetch_assoc()){
+        ?>
+      <td> <?php echo $rws['nom'].' '  ; echo $rws['prenom']; ?>
+      </td><?php }?>
+
+        <?php
+             $voiture=$row['voiture'];
+
+             include '../client/config.php';
+
+             $sel = "SELECT * FROM voiture where id = '$voiture'  ";
+             $rs = $conn->query($sel);
+             while($rws = $rs->fetch_assoc()){
+        ?>
+      <td>  <?php echo $row['voiture']; ?> <br>
+        <img src="../img/products/<?php echo $rws['pic'];?>" alt=""> 
+        <?php echo $rws['marque']; echo ' '.$rws['modele']; ?>
+      </td> <?php }?>
+      <td ><?php echo $row['depart']; ?></td>
+      <td ><?php echo $row['retour']; ?></td>
+      <td><?php echo $row['livraison']; ?></td>
+      <td><?php echo $row['chauffeur']; ?></td>
+      <td><?php 
+     echo $row['etat'];
+            ?>
+      
+      </td>
+      <td><?php echo $row['prix']; ?></td> 
+      <td><?php echo $row['paiement']; ?></td>
+      <td><?php echo $row['date_achat']; ?></td> 
+    </td>
+     
+    </tr>
+    <?php   }
+        }
+   
+
+ elseif (isset($_GET['but8'])) 
   {   
    if (empty($_GET['acin'])){
    
-      $query = "SELECT * FROM commande ORDER BY id asc" ;
+      $query = "SELECT * FROM commande  where etat='en cours' ORDER BY id asc" ;
 
    }
    else {
@@ -488,7 +574,7 @@ $result_tasks = mysqli_query($conn, $query);
     </tr>
     <?php   }
         }
-else {  
+else{  
 ?>
 
     
@@ -549,7 +635,10 @@ $query = "UPDATE `commande` SET `etat`='effectue' WHERE (Datediff(now(),retour)>
   
 
     </tr>
-    <?php  }}?>
+    <?php  }} ?>
+
+<!-- NEWWWWWWWWWWWWWWWWWWWWWWWW-->
+
         </tbody>
         </table>
         <br>
