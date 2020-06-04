@@ -380,7 +380,7 @@ while($row = mysqli_fetch_assoc($result_total)) {
 ?></div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                      <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
                     </div>
                   </div>
                 </div>
@@ -404,7 +404,7 @@ while($row = mysqli_fetch_assoc($result_paypal)) {
 ?></div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                      <i class="fab fa-cc-paypal fa-2x text-gray-300"></i>
                     </div>
                   </div>
                 </div>
@@ -435,7 +435,7 @@ while($row = mysqli_fetch_assoc($result_agence)) {
                       </div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                      <i class="fas fa-building fa-2x text-gray-300"></i>
                     </div>
                   </div>
                 </div>
@@ -459,7 +459,7 @@ while($row = mysqli_fetch_assoc($result_carte)) {
 ?></div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-comments fa-2x text-gray-300"></i>
+                      <i class="far fa-credit-card fa-2x text-gray-300"></i>
                     </div>
                   </div>
                 </div>
@@ -505,7 +505,7 @@ $chart_data = substr($chart_data, 0, -2);
                 <!-- Card Body -->
        <?php 
 $connect = mysqli_connect("localhost", "root", "", "crud");
-$query = "SELECT id,TIMESTAMPDIFF(DAY,depart,retour) as jour FROM `commande`";
+$query = "SELECT id,TIMESTAMPDIFF(DAY,depart,retour) as jour FROM `commande`  ORDER BY `id` asc ";
 $result = mysqli_query($connect, $query);
 $chart_data = '';
 while($row = mysqli_fetch_array($result))
@@ -529,7 +529,7 @@ Morris.Bar({
  data:[<?php echo $chart_data; ?>],
  xkey:'id',
  ykeys:['jour'],
- labels:['Jours','Date'],
+ labels:['Nombres de jours'],
  hideHover:'auto',
  stacked:true
 });
@@ -558,18 +558,7 @@ $data = json_encode($data);
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                   <h6 class="m-0 font-weight-bold text-primary">Etat des réservations</h6>
-                  <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                      <div class="dropdown-header">Dropdown Header:</div>
-                      <a class="dropdown-item" href="#">Action</a>
-                      <a class="dropdown-item" href="#">Another action</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                  </div>
+                  
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -625,6 +614,79 @@ $(document).ready(function(){
         chart.draw(data, options);
       }
     </script>
+     <div class="row">
+
+            <!-- Content Column -->
+            <div class="col-xl-8 col-lg-7">
+
+         <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Pourcentage des réservations avec et sans chauffeur</h6>
+                 
+                </div>
+ <div class="card-body">
+                  <div >
+        <div id="piechart2"  style="width: 650px; height: 500px;"></div>
+  </div>
+                </div>
+              </div>
+
+</div>
+
+<div class="col-xl-4 col-lg-5">
+              <div class="card shadow mb-4" style=" height: 595px;">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Rechercher les réservations</h6>
+                  
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+<form  method="GET">
+          <div class="form-group">
+ 
+            <input name="date1" type="date" class="form-control "  aria-label="Search" aria-describedby="basic-addon2"/>  </div>
+
+                      <div class="form-group">
+
+            <input name="date2" type="date" class="form-control " aria-label="Search" aria-describedby="basic-addon2"/>  </div>
+          
+          <div class="form-group">
+             <input type="submit" name="tridate" class="btn btn-primary"  value="Rechercher">
+
+            </div>
+          </form>
+         <?php 
+    if (isset($_GET['tridate'])) 
+  {   if (!empty($_GET['date1']and $_GET['date2'] ))
+{
+   $date1= $_GET['date1'];
+      $date2= $_GET['date2'];?>
+      <br><br>
+
+        <?php
+
+          $query_recherche = "SELECT  count(id) as nb_commande FROM commande  where (depart between '$date1' and '$date2') and  (retour between '$date1' and '$date2') and etat='en cours'";
+          $res = mysqli_query($conn,$query_recherche);             
+  while  ($rows =mysqli_fetch_array($res)): ?>
+          <a style="font-weight: bold;font-size: 15px; color:#004FE4;"><?php echo 'Du '.$date1.' Au '.$date2;?>
+          <br><br> </a> <a style="font-weight: bold;font-size: 25px; color:#1D345F; ">
+          <?php  echo "Vous avez ".$rows['nb_commande'].' réservations';?> </a>
+                <?php   endwhile;
+
+        }
+       else{ ?> <a style="font-weight: bold;font-size: 25px; color:#8194B8; "> <?php echo "Faites une recherche ";?> </a>  <?php
+}}
+
+
+          ?>
+                </div>
+              </div>
+            </div>
+          </div>
+
+              </div>
 
 
               <div class="card shadow mb-4">
@@ -641,19 +703,7 @@ $(document).ready(function(){
               </div>
 
             <!-- Content Column -->
-         <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Pourcentage des réservations avec et sans chauffeur</h6>
-                 
-                </div>
- <div class="card-body">
-                  <div style="width: 900px; height: 500px;">
-        <center><div id="piechart2"  style="width: 900px; height: 500px;"></div></center>
-  </div>
-                </div>
-              </div>
-
+           
             <script type="text/javascript" src="js/loader.js"></script>
 
     <script type="text/javascript">
@@ -684,6 +734,8 @@ $(document).ready(function(){
         chart.draw(data, options);
       }
     </script>
+
+      
         <!-- /.container-fluid -->
 
       <!-- End of Main Content -->
